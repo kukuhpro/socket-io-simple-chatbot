@@ -28,3 +28,4 @@
 *.app
 
 src/build
+web/node_modules
