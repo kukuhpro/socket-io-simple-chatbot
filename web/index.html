@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Example Socket IO nodeJS and C++ ChatBot Application</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io.connect();
+      var myname;
+
+      function on_push_run() {
+        var command = document.getElementById('command').value;
+        socket.emit('run', {
+          command: command
+        });
+        var new_element = document.createElement('pre');
+        new_element.appendChild(document.createTextNode(myname + '$ ' + command));
+        document.getElementById('replies').appendChild(new_element);
+      }
+
+      socket.on('run', function(data) {
+        var new_element = document.createElement('pre');
+        new_element.appendChild(document.createTextNode(data.from + '$ ' + data.command));
+        document.getElementById('replies').appendChild(new_element);
+      });
+      
+      socket.on('reply', function(data) {
+        var new_element = document.createElement('pre');
+        new_element.appendChild(document.createTextNode(data.from + ':'));
+        var str = data.output.replace('\r\n', '\n');
+        var lines = str.split('\n');
+        for (var i = 0; i < lines.length; i ++) {
+	  new_element.appendChild(document.createElement('br'));
+	  new_element.appendChild(document.createTextNode(lines[i]));
+	}		    
+        document.getElementById('replies').appendChild(new_element);
+      });
+
+      window.onload = function() {
+        myname = window.prompt('Input Your Name : ', '');
+        socket.emit('join', {
+          type: 'browser',
+          name: myname
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <input type="text" id="command"/>
+    <input type="button" value="Send" onclick="on_push_run();";>
+    <tt id='replies'></tt>
+  </body>
+</html>
